@@ -10,14 +10,18 @@ from burp import IBurpExtender
 from burp import IHttpListener
 from burp import ISessionHandlingAction
 
+
   
 # Regex are used for capturing the token value from the response
 import re
 import ssl
 import urllib2
 import httplib
+import base64
 
 #I still hate regex. It's witchcraft. :)
+
+#PLEASE UPDATE THESE LINES - 1st SECTION
 
 #Regex to find the token in the response
 AccessTokenRegex = re.compile(r"access_token\"\:\"(.*?)\"")
@@ -89,12 +93,18 @@ class BurpExtender(IBurpExtender, IHttpListener, ISessionHandlingAction):
 		
 		
 	def BearerRefresh(self):
+		# PLEASE UPDATE THESE LINES - 2nd SECTION
 		print "Authing App - visiting URL"
+		# HOST SHOULD BE IN FORMAT https://host.com
 		host = "REPLACE_AUTH_URL_HERE"
 		req = urllib2.Request(host)
 		req.add_header('User-Agent','Mozilla/5.0') # (Windows NT 10.0; Win64; x64; rv:61.0) Gecko/20100101 Firefox/61.0')
+		# UNCOMMENT (OR MODIFY) LINE BELOW IF YOU WISH TO SEND JSON
+		#req.add_header('Content-Type', 'application/json')
 		#REPLACE data BELOW WITH APPROPRIATE VARIABLES
 		data = "grant_type=client_credentials&client_id=CLIENTID&client_secret=CLIENTSECRET&scope=SCOPE&audience=AUDIENCE"
+		#IF THE DATA YOU NEED TO SEND CONTAINS INVERTED COMMAS i.e JSON, THEN YOU CAN USE BASE64 TO SEND IT
+		#data = base64.b64decode('eyJncmFudF90eXB==')
 		req.add_data(data)
 		resp = urllib2.urlopen(req) #, context=ssl._create_unverified_context())
 		content = resp.read()
